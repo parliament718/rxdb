@@ -20,12 +20,12 @@ function createWindow(dbSuffix) {
         width,
         height,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
+            // nodeIntegration: true,
+            // contextIsolation: false
 
-            // nodeIntegration: false,
-            // contextIsolation: true,
-            // preload: path.join(__dirname, 'preload.js')
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js')
         }
     });
 

@@ -3,6 +3,8 @@ require('electron-window-manager');
 const path = require('path');
 const url = require('url');
 const database = require('./database');
+const remoteMain = require('@electron/remote/main');
+remoteMain.initialize();
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
@@ -18,7 +20,12 @@ function createWindow(dbSuffix) {
         width,
         height,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            contextIsolation: false
+
+            // nodeIntegration: false,
+            // contextIsolation: true,
+            // preload: path.join(__dirname, 'preload.js')
         }
     });
 
@@ -27,6 +34,8 @@ function createWindow(dbSuffix) {
         protocol: 'file:',
         slashes: true
     }));
+
+    remoteMain.enable(w.webContents);
 
     const x = windows.length * width;
     const y = 0;

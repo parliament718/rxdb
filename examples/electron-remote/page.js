@@ -1,7 +1,8 @@
-const electron = require('electron');
-const renderTest = require('./test/render.test.js');
+// const electron = require('electron');
+// const renderTest = require('./test/render.test.js');
+// const remote = window.require('@electron/remote');
 
-require('babel-polyfill');
+// require('babel-polyfill');
 
 const heroesList = document.querySelector('#heroes-list');
 
@@ -10,9 +11,13 @@ async function run() {
      * to check if rxdb works correctly, we run some integration-tests here
      * if you want to use this electron-example as boilerplate, remove this line
      */
-    await renderTest();
+    // await renderTest();
 
-    const db = electron.remote.getGlobal('db'); // we get the db object from the main render
+    //use with contextIsolation: false
+    // const db = window.require('@electron/remote').getGlobal('db'); // we get the db object from the main render
+
+    //use with contextIsolation: true and preload.js
+    const db = window.api.getGlobal('db'); // we get the db object from the main render
 
     /**
      * map the result of the find-query to the heroes-list in the dom

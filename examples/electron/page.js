@@ -1,6 +1,6 @@
 const electron = require('electron');
 const database = require('./database');
-const renderTest = require('./test/render.test.js');
+// const renderTest = require('./test/render.test.js');
 
 require('babel-polyfill');
 
@@ -11,22 +11,24 @@ const syncURL = 'http://localhost:10102/db/heroes';
 const {
     addRxPlugin
 } = require('rxdb');
-addRxPlugin(require('pouchdb-adapter-idb'));
+
+// addRxPlugin(require('rxdb/plugins/dev-mode').RxDBDevModePlugin);
+addRxPlugin(require('rxdb/plugins/leader-election').RxDBLeaderElectionPlugin);
+addRxPlugin(require('rxdb/plugins/replication-couchdb').RxDBReplicationCouchDBPlugin);
 
 async function run() {
     /**
      * to check if rxdb works correctly, we run some integration-tests here
      * if you want to use this electron-example as boilerplate, remove this line
      */
-    await renderTest();
+    // await renderTest();
 
     const currentWindow = electron.remote.getCurrentWindow();
     const db = await database.getDatabase(
         'heroesdb' + currentWindow.custom.dbSuffix, // we add a random timestamp in dev-mode to reset the database on each start
-        'idb'
     );
     console.log('starting sync with ' + syncURL);
-    const syncState = await db.heroes.sync({
+    const syncState = await db.heroes.syncCouchDB({
         remote: syncURL,
         direction: {
             pull: true,
@@ -40,7 +42,7 @@ async function run() {
      */
     db.heroes.find()
         .sort({
-            name: 'asc'
+            id: 'asc'
         })
         .$.subscribe(function (heroes) {
             if (!heroes) {
@@ -64,6 +66,7 @@ async function run() {
         const name = document.querySelector('input[name="name"]').value;
         const color = document.querySelector('input[name="color"]').value;
         const obj = {
+            id: new Date().getTime().toString(),
             name: name,
             color: color
         };

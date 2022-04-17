@@ -3,10 +3,15 @@ require('electron-window-manager');
 const path = require('path');
 const url = require('url');
 const database = require('./database');
+const { 
+    addPouchPlugin
+    
+} = require('rxdb/plugins/pouchdb');
 
 const { addRxPlugin } = require('rxdb');
+
 addRxPlugin(require('rxdb/plugins/server').RxDBServerPlugin);
-addRxPlugin(require('pouchdb-adapter-memory'));
+addPouchPlugin(require('pouchdb-adapter-memory'));
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
@@ -44,8 +49,7 @@ app.on('ready', async function () {
     const dbSuffix = new Date().getTime(); // we add a random timestamp in dev-mode to reset the database on each start
 
     const db = await database.getDatabase(
-        'heroesdb' + dbSuffix,
-        'memory'
+        'heroesdb'
     );
 
     /**
@@ -61,7 +65,7 @@ app.on('ready', async function () {
     console.log('started server');
 
     // show heroes table in console
-    db.heroes.find().sort('name').$.subscribe(heroDocs => {
+    db.heroes.find().sort('id').$.subscribe(heroDocs => {
         console.log('### got heroes(' + heroDocs.length + '):');
         heroDocs.forEach(doc => console.log(
             doc.name + '  |  ' + doc.color
@@ -69,7 +73,7 @@ app.on('ready', async function () {
     });
 
     createWindow(dbSuffix);
-    createWindow(dbSuffix);
+    // createWindow(dbSuffix);
 });
 
 app.on('window-all-closed', function () {

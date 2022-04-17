@@ -1,24 +1,40 @@
 const {
     createRxDatabase,
     addRxPlugin
+    
 } = require('rxdb');
-addRxPlugin(require('pouchdb-adapter-http'));
+
+const { 
+    addPouchPlugin,
+    getRxStoragePouch
+} = require('rxdb/plugins/pouchdb');
+
+addRxPlugin(require('rxdb/plugins/dev-mode').RxDBDevModePlugin);
+addRxPlugin(require('rxdb/plugins/query-builder').RxDBQueryBuilderPlugin);
+addPouchPlugin(require('pouchdb-adapter-http'));
+addPouchPlugin(require('pouchdb-adapter-leveldb'));
+const leveldown = require('leveldown');
 
 const heroSchema = {
     title: 'hero schema',
     description: 'describes a simple hero',
     version: 0,
     type: 'object',
+    primaryKey: 'id',
     properties: {
+        id: {
+            type: 'string',
+            primary: true,
+            maxLength: 20
+        },
         name: {
             type: 'string',
-            primary: true
         },
         color: {
             type: 'string'
         }
     },
-    required: ['color']
+    required: ['id', 'name', 'color']
 };
 
 let _getDatabase; // cached
@@ -30,14 +46,14 @@ function getDatabase(name, adapter) {
 async function createDatabase(name, adapter) {
     const db = await createRxDatabase({
         name,
-        adapter,
-        password: 'myLongAndStupidPassword'
+        storage: getRxStoragePouch(leveldown)
     });
 
     console.log('creating hero-collection..');
-    await db.collection({
-        name: 'heroes',
-        schema: heroSchema
+    await db.addCollections({
+        heroes: {
+            schema: heroSchema
+        }
     });
 
     return db;

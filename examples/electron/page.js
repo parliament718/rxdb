@@ -25,7 +25,7 @@ async function run() {
 
     const currentWindow = electron.remote.getCurrentWindow();
     const db = await database.getDatabase(
-        'heroesdb' + currentWindow.custom.dbSuffix, // we add a random timestamp in dev-mode to reset the database on each start
+        'database/heroesdb' + currentWindow.custom.dbSuffix, // we add a random timestamp in dev-mode to reset the database on each start
     );
     console.log('starting sync with ' + syncURL);
     const syncState = await db.heroes.syncCouchDB({

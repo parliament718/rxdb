@@ -49,7 +49,7 @@ app.on('ready', async function () {
     const dbSuffix = new Date().getTime(); // we add a random timestamp in dev-mode to reset the database on each start
 
     const db = await database.getDatabase(
-        'heroesdb'
+        'database/heroesdb'
     );
 
     /**
